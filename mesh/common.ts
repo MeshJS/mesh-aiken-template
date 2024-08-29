@@ -4,43 +4,77 @@ import {
   YaciProvider,
   MeshTxBuilder,
 } from "@meshsdk/core";
+import axios from "axios";
 
-export const provider = new YaciProvider("http://localhost:8080/api/v1/");
+const yaciBaseUrl = process.env.YACI_BASE_URL || "https://yaci-node.meshjs.dev";
 
-const signingKey: AppWalletKeyType = {
-  type: "mnemonic",
-  words: new Array(24).fill("summer") as string[],
-};
+export class MeshYaciProvider extends YaciProvider {
+  constructor() {
+    super(`${yaciBaseUrl}/api/v1`);
+  }
 
-export const wallet = new MeshWallet({
-  key: signingKey,
-  networkId: 0,
-  fetcher: provider,
-  submitter: provider,
-});
+  fundWallet = async (walletAddress: string, adaAmount: number) => {
+    const res = await axios.post(`${yaciBaseUrl}/admin/topup`, {
+      wallet_address: walletAddress,
+      ada_amount: adaAmount,
+    });
+    return res.data;
+  };
+}
 
-export const newTx = async () => {
-  const txBuilder = new MeshTxBuilder({
+export const provider = new MeshYaciProvider();
+
+export const newWallet = (providedMnemonic?: string[]) => {
+  let mnemonic = providedMnemonic;
+  if (!providedMnemonic) {
+    mnemonic = MeshWallet.brew() as string[];
+    console.log(
+      "Wallet generated, if you want to reuse the same address, please save the mnemonic:"
+    );
+    console.log(mnemonic);
+  }
+  const signingKey: AppWalletKeyType = {
+    type: "mnemonic",
+    words: mnemonic as string[],
+  };
+
+  const wallet = new MeshWallet({
+    key: signingKey,
+    networkId: 0,
     fetcher: provider,
-    evaluator: provider,
+    submitter: provider,
   });
-
-  const utxos = await wallet.getUtxos();
-  const address = wallet.getUsedAddresses()[0];
-  txBuilder
-    .changeAddress(address)
-    .selectUtxosFrom(utxos, "largestFirstMultiAsset");
-  return txBuilder;
+  return wallet;
 };
 
-export const newValidationTx = async () => {
-  const txBuilder = await newTx();
-  const collateral = (await wallet.getCollateral())[0];
-  txBuilder.txInCollateral(
-    collateral.input.txHash,
-    collateral.input.outputIndex,
-    collateral.output.amount,
-    collateral.output.address
-  );
-  return txBuilder;
-};
+export class MeshTx {
+  constructor(public wallet: MeshWallet) {}
+
+  newTx = async () => {
+    const yaciProtocolParam = await provider.fetchProtocolParameters();
+
+    const txBuilder = new MeshTxBuilder({
+      fetcher: provider,
+      evaluator: provider,
+    });
+    const utxos = await this.wallet.getUtxos();
+    const address = this.wallet.getUsedAddresses()[0];
+    txBuilder.changeAddress(address).selectUtxosFrom(utxos);
+    return txBuilder;
+  };
+
+  newValidationTx = async () => {
+    const txBuilder = await this.newTx();
+    const collateral = (await this.wallet.getCollateral())[0];
+    txBuilder.txInCollateral(
+      collateral.input.txHash,
+      collateral.input.outputIndex,
+      collateral.output.amount,
+      collateral.output.address
+    );
+    return txBuilder;
+  };
+}
+
+export const sleep = (second: number) =>
+  new Promise((resolve) => setTimeout(resolve, second * 1000));

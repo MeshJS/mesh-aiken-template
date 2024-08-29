@@ -1,21 +1,27 @@
-import { newValidationTx } from "../common";
 import { applyParamsToScript } from "@meshsdk/core-csl";
 import blueprint from "../../aiken-workspace/plutus.json";
-import { resolveScriptHash } from "@meshsdk/core";
+import { MeshWallet, resolveScriptHash } from "@meshsdk/core";
+import { MeshTx } from "../common";
 
 const mintingScriptCompiledCode = blueprint.validators[0].compiledCode;
 
-export const mintingAlwaysSucceed = async () => {
-  const scriptCbor = applyParamsToScript(mintingScriptCompiledCode, []);
-  const policyId = resolveScriptHash(scriptCbor, "V2");
+export class MeshContractTx extends MeshTx {
+  constructor(wallet: MeshWallet) {
+    super(wallet);
+  }
 
-  const txBuilder = await newValidationTx();
-  const txHex = await txBuilder
-    .mintPlutusScriptV2()
-    .mint("1", policyId, "")
-    .mintingScript(scriptCbor)
-    .mintRedeemerValue("")
-    .complete();
+  mintingAlwaysSucceed = async () => {
+    const scriptCbor = applyParamsToScript(mintingScriptCompiledCode, []);
+    const policyId = resolveScriptHash(scriptCbor, "V2");
 
-  return txHex;
-};
+    const txBuilder = await this.newValidationTx();
+    const txHex = await txBuilder
+      .mintPlutusScriptV2()
+      .mint("1", policyId, "")
+      .mintingScript(scriptCbor)
+      .mintRedeemerValue("")
+      .complete();
+
+    return txHex;
+  };
+}
