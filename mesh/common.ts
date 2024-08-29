@@ -27,7 +27,9 @@ export const newTx = async () => {
 
   const utxos = await wallet.getUtxos();
   const address = wallet.getUsedAddresses()[0];
-  txBuilder.changeAddress(address).selectUtxosFrom(utxos);
+  txBuilder
+    .changeAddress(address)
+    .selectUtxosFrom(utxos, "largestFirstMultiAsset");
   return txBuilder;
 };
 

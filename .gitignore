@@ -6,3 +6,4 @@ aiken-workspace/build/
 aiken-workspace/docs/
 
 node_modules/
+yarn.lock

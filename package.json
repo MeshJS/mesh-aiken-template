@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/MeshJS/mesh-aiken-template#readme",
   "dependencies": {
-    "@meshsdk/core": "^1.6.11",
-    "@meshsdk/core-csl": "^1.6.11"
+    "@meshsdk/core": "^1.6",
+    "@meshsdk/core-csl": "^1.6"
   }
 }

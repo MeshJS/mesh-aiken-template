@@ -10,7 +10,7 @@ export const mintingAlwaysSucceed = async () => {
   const policyId = resolveScriptHash(scriptCbor, "V2");
 
   const txBuilder = await newValidationTx();
-  const txHex = txBuilder
+  const txHex = await txBuilder
     .mintPlutusScriptV2()
     .mint("1", policyId, "")
     .mintingScript(scriptCbor)
