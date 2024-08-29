@@ -2,32 +2,7 @@ import { newWallet, provider, sleep } from "./common";
 import { MeshContractTx } from "./transactions/minting";
 
 const testTx = async () => {
-  const wallet = newWallet([
-    "file",
-    "allow",
-    "member",
-    "sister",
-    "rescue",
-    "sound",
-    "poverty",
-    "occur",
-    "hat",
-    "amount",
-    "verify",
-    "fade",
-    "now",
-    "senior",
-    "immense",
-    "nest",
-    "asthma",
-    "fence",
-    "torch",
-    "permit",
-    "figure",
-    "gauge",
-    "canvas",
-    "gown",
-  ]);
+  const wallet = newWallet();
 
   const tx = new MeshContractTx(wallet);
   const address = wallet.getUsedAddresses()[0];
