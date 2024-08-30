@@ -51,15 +51,16 @@ export class MeshTx {
   constructor(public wallet: MeshWallet) {}
 
   newTx = async () => {
-    const yaciProtocolParam = await provider.fetchProtocolParameters();
-
     const txBuilder = new MeshTxBuilder({
       fetcher: provider,
       evaluator: provider,
     });
     const utxos = await this.wallet.getUtxos();
     const address = this.wallet.getUsedAddresses()[0];
-    txBuilder.changeAddress(address).selectUtxosFrom(utxos);
+    txBuilder
+      .changeAddress(address)
+      .selectUtxosFrom(utxos)
+      .setNetwork("preprod");
     return txBuilder;
   };
 
