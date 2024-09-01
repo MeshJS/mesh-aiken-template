@@ -57,10 +57,7 @@ export class MeshTx {
     });
     const utxos = await this.wallet.getUtxos();
     const address = this.wallet.getUsedAddresses()[0];
-    txBuilder
-      .changeAddress(address)
-      .selectUtxosFrom(utxos)
-      .setNetwork("preprod");
+    txBuilder.changeAddress(address).selectUtxosFrom(utxos);
     return txBuilder;
   };
 
