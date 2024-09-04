@@ -48,7 +48,11 @@ export const newWallet = (providedMnemonic?: string[]) => {
 };
 
 export class MeshTx {
-  constructor(public wallet: MeshWallet) {}
+  address: string;
+  constructor(public wallet: MeshWallet) {
+    const address = this.wallet.getUsedAddresses()[0];
+    this.address = address;
+  }
 
   newTx = async () => {
     const txBuilder = new MeshTxBuilder({
@@ -56,8 +60,7 @@ export class MeshTx {
       evaluator: provider,
     });
     const utxos = await this.wallet.getUtxos();
-    const address = this.wallet.getUsedAddresses()[0];
-    txBuilder.changeAddress(address).selectUtxosFrom(utxos);
+    txBuilder.changeAddress(this.address).selectUtxosFrom(utxos);
     return txBuilder;
   };
 
@@ -71,6 +74,24 @@ export class MeshTx {
       collateral.output.address
     );
     return txBuilder;
+  };
+
+  prepare = async () => {
+    const txBuilder = await this.newTx();
+    const txHex = await txBuilder
+      .txOut(this.address, [{ unit: "lovelace", quantity: "5000000" }])
+      .txOut(this.address, [{ unit: "lovelace", quantity: "5000000" }])
+      .txOut(this.address, [{ unit: "lovelace", quantity: "5000000" }])
+      .complete();
+    const singedTx = this.wallet.signTx(txHex);
+    const txHash = await this.wallet.submitTx(singedTx);
+    console.log("Prepare txHash:", txHash);
+  };
+
+  signAndSubmit = async (txHex: string, trace = "txHash: ") => {
+    const signedTx = this.wallet.signTx(txHex, true);
+    const txHash = await this.wallet.submitTx(signedTx);
+    console.log(trace, txHash);
   };
 }
 
