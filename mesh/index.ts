@@ -35,6 +35,13 @@ const testTx = async () => {
     await sleep(1);
   };
 
+  const testPublishV3 = async () => {
+    const txHex = await tx.deregisterStake();
+    // console.log("PublishV3", txHex);
+    await tx.signAndSubmit(txHex, "PublishV3");
+    await sleep(1);
+  };
+
   console.log("Start testing Aiken PlutusV3 + Mesh on Yaci");
 
   const wallet = newWallet();
@@ -43,6 +50,7 @@ const testTx = async () => {
   await testMintV3();
   await testUnlockV3();
   await testWithdrawV3();
+  await testPublishV3();
 };
 
 testTx();

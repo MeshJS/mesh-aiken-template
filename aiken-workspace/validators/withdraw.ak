@@ -7,6 +7,10 @@ validator always_succeed(_key_hash: VerificationKeyHash) {
     True
   }
 
+  publish(_redeemer: Data, _credential: Credential, _tx: Transaction) {
+    True
+  }
+
   else(_) {
     fail @"unsupported purpose"
   }

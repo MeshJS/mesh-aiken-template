@@ -134,4 +134,28 @@ export class MeshContractTx extends MeshTx {
 
     return txHex;
   };
+
+  deregisterStake = async () => {
+    const ownPubKey = deserializeAddress(this.address).pubKeyHash;
+    const withdrawScriptCbor = applyParamsToScript(
+      withdrawScriptCompiledCode,
+      [ownPubKey],
+      "Mesh"
+    );
+    const withdrawScriptHash = resolveScriptHash(withdrawScriptCbor, "V3");
+    const withdrawScriptRewardAddress = serializeRewardAddress(
+      withdrawScriptHash,
+      true,
+      0
+    );
+
+    const txBuilder = await this.newValidationTx();
+    const txHex = await txBuilder
+      .deregisterStakeCertificate(withdrawScriptRewardAddress)
+      .certificateScript(withdrawScriptCbor, "V3")
+      .certificateRedeemerValue("")
+      .complete();
+
+    return txHex;
+  };
 }
