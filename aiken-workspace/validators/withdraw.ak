@@ -1,5 +1,6 @@
 use aiken/crypto.{VerificationKeyHash}
 use cardano/address.{Credential, Script}
+use cardano/certificate.{Certificate}
 use cardano/transaction.{Transaction, placeholder}
 
 validator always_succeed(_key_hash: VerificationKeyHash) {
@@ -7,7 +8,7 @@ validator always_succeed(_key_hash: VerificationKeyHash) {
     True
   }
 
-  publish(_redeemer: Data, _credential: Credential, _tx: Transaction) {
+  publish(_redeemer: Data, _credential: Certificate, _tx: Transaction) {
     True
   }
 
