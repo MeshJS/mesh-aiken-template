@@ -5,7 +5,7 @@
   "main": "mesh/index.ts",
   "scripts": {
     "aiken": "cd aiken-workspace && aiken check && aiken build",
-    "test": "yarn aiken && ts-node mesh/index.ts"
+    "test": "npm run aiken && ts-node mesh/index.ts"
   },
   "repository": {
     "type": "git",

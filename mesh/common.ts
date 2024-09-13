@@ -3,6 +3,7 @@ import {
   AppWalletKeyType,
   YaciProvider,
   MeshTxBuilder,
+  SlotConfig,
 } from "@meshsdk/core";
 import axios from "axios";
 
@@ -18,6 +19,11 @@ export class MeshYaciProvider extends YaciProvider {
       wallet_address: walletAddress,
       ada_amount: adaAmount,
     });
+    return res.data;
+  };
+
+  getGenesis = async () => {
+    const res = await axios.get(`${yaciBaseUrl}/admin/genesis`);
     return res.data;
   };
 }
@@ -49,6 +55,7 @@ export const newWallet = (providedMnemonic?: string[]) => {
 
 export class MeshTx {
   address: string;
+
   constructor(public wallet: MeshWallet) {
     const address = this.wallet.getUsedAddresses()[0];
     this.address = address;
