@@ -43,7 +43,8 @@ export class MeshContractTx extends MeshTx {
   };
 
   lockAndRegisterCert = async () => {
-    const ownPubKey = deserializeAddress(this.address).pubKeyHash;
+    const address = (await this.wallet.getUsedAddresses())[0];
+    const ownPubKey = deserializeAddress(address).pubKeyHash;
     const spendingScriptCbor = applyCborEncoding(spendingScriptCompiledCode);
     const validatorAddress = serializePlutusScript({
       code: spendingScriptCbor,
@@ -72,7 +73,8 @@ export class MeshContractTx extends MeshTx {
   };
 
   unlockHelloWorld = async () => {
-    const ownPubKey = deserializeAddress(this.address).pubKeyHash;
+    const address = (await this.wallet.getUsedAddresses())[0];
+    const ownPubKey = deserializeAddress(address).pubKeyHash;
     const spendingScriptCbor = applyCborEncoding(spendingScriptCompiledCode);
     const validatorAddress = serializePlutusScript({
       code: spendingScriptCbor,
@@ -111,7 +113,8 @@ export class MeshContractTx extends MeshTx {
   };
 
   withdrawZero = async () => {
-    const ownPubKey = deserializeAddress(this.address).pubKeyHash;
+    const address = (await this.wallet.getUsedAddresses())[0];
+    const ownPubKey = deserializeAddress(address).pubKeyHash;
     const withdrawScriptCbor = applyParamsToScript(
       withdrawScriptCompiledCode,
       [ownPubKey],
@@ -136,7 +139,8 @@ export class MeshContractTx extends MeshTx {
   };
 
   deregisterStake = async () => {
-    const ownPubKey = deserializeAddress(this.address).pubKeyHash;
+    const address = (await this.wallet.getUsedAddresses())[0];
+    const ownPubKey = deserializeAddress(address).pubKeyHash;
     const withdrawScriptCbor = applyParamsToScript(
       withdrawScriptCompiledCode,
       [ownPubKey],

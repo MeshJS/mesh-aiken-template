@@ -6,24 +6,20 @@ import {
 } from "@meshsdk/core";
 import axios from "axios";
 
-const yaciBaseUrl = process.env.YACI_BASE_URL || "https://yaci-node.meshjs.dev";
+const yaciBaseUrl = process.env.YACI_BASE_URL || "http://localhost:8080";
+const yaciAdminUrl = process.env.YACI_ADMIN_URL || "http://localhost:10000";
 
 export class MeshYaciProvider extends YaciProvider {
   constructor() {
-    super(`${yaciBaseUrl}/api/v1`);
+    super(`${yaciBaseUrl}/api/v1`, yaciAdminUrl);
   }
 
   fundWallet = async (walletAddress: string, adaAmount: number) => {
-    const res = await axios.post(`${yaciBaseUrl}/admin/topup`, {
-      wallet_address: walletAddress,
-      ada_amount: adaAmount,
-    });
-    return res.data;
+    return await this.addressTopup(walletAddress, adaAmount.toString());
   };
 
-  getGenesis = async () => {
-    const res = await axios.get(`${yaciBaseUrl}/admin/genesis`);
-    return res.data;
+  getGenesis = async (era = "shelley") => {
+    return await this.getGenesisByEra(era);
   };
 }
 
@@ -88,13 +84,13 @@ export class MeshTx {
       .txOut(address, [{ unit: "lovelace", quantity: "5000000" }])
       .txOut(address, [{ unit: "lovelace", quantity: "5000000" }])
       .complete();
-    const singedTx = this.wallet.signTx(txHex);
-    const txHash = await this.wallet.submitTx(singedTx);
+    const signedTx = await this.wallet.signTx(txHex);
+    const txHash = await this.wallet.submitTx(signedTx);
     console.log("Prepare txHash:", txHash);
   };
 
   signAndSubmit = async (txHex: string, trace = "txHash: ") => {
-    const signedTx = this.wallet.signTx(txHex, true);
+    const signedTx = await this.wallet.signTx(txHex, true);
     const txHash = await this.wallet.submitTx(signedTx);
     console.log(trace, txHash);
   };
